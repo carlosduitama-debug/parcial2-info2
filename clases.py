@@ -202,3 +202,24 @@ class ArchivoMAT(Archivo):
     def __str__(self):
         tabla = pd.DataFrame(self.__info, columns=["Variable", "Dimensiones", "Tipo"])
         return tabla.to_string(index=False) + "\nVariable usada: " + self.__variable
+
+# Funcion para configurar de manera correcta las graficas que se hacen.
+
+    def estadisticas_dos_ejes(self, eje1, eje2):
+        promedio = np.mean(self.__matriz, axis=(eje1, eje2), dtype=np.float64)
+        desviacion = np.std(self.__matriz, axis=(eje1, eje2), dtype=np.float64)
+        print("Forma del promedio:", promedio.shape)
+        print("Forma de la desviación estándar:", desviacion.shape)
+
+        fig = plt.figure(figsize=(8, 6))
+        ax = fig.add_subplot(111)
+        ax.boxplot([promedio, desviacion])
+        ax.set_xticks([1, 2], ["Promedio", "Desviación estándar"])
+        ax.set_title(f"{self.verNombre()} - ejes {eje1} y {eje2}")
+        ax.set_xlabel("Estadístico")
+        ax.set_ylabel("Voltaje (µV)")
+
+        ruta = guardar_figura(fig, f"{os.path.splitext(self.verNombre())[0]}_boxplots_ejes_{eje1}_{eje2}")
+        plt.show()
+        plt.close(fig)
+        return ruta
