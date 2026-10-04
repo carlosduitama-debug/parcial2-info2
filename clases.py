@@ -223,3 +223,35 @@ class ArchivoMAT(Archivo):
         plt.show()
         plt.close(fig)
         return ruta
+# Funcion para operar los canales.
+
+    def operar_cuatro_canales(self, funcion, canales, pmin, pmax):
+        # canales: 4 números de canal como los ve el usuario.
+        # pmin y pmax: puntos de la matriz convertida a 2D (ambos incluidos).
+        matriz2d = self.convertirA2D()
+        senales = matriz2d[[c - 1 for c in canales], pmin:pmax + 1].astype(np.float64)
+        resultado = funcion(senales[0], senales[1], senales[2], senales[3])
+        tiempo = np.arange(pmin, pmax + 1) / self.__fs
+
+        fig = plt.figure(figsize=(11, 8))
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 1, 2)
+        fig.suptitle(f"{self.verNombre()} - puntos {pmin} a {pmax}")
+
+        for i in range(4):
+            ax1.plot(tiempo, senales[i], label=f"Canal {canales[i]}")
+        ax1.set_title("Canales seleccionados")
+        ax1.set_xlabel("Tiempo (s)")
+        ax1.set_ylabel("Voltaje (µV)")
+        ax1.legend()
+
+        ax2.plot(tiempo, resultado, color="black")
+        ax2.set_title(f"Resultado: {funcion.__name__} de los canales {canales}")
+        ax2.set_xlabel("Tiempo (s)")
+        ax2.set_ylabel("Amplitud")
+
+        fig.tight_layout()
+        ruta = guardar_figura(fig, f"{os.path.splitext(self.verNombre())[0]}_{funcion.__name__}_{pmin}-{pmax}")
+        plt.show()
+        plt.close(fig)
+        return ruta
