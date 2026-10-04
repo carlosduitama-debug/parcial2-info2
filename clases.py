@@ -1,10 +1,10 @@
 # Clases.py - Parcial 2, Informatica 2.
 # En este archivo se encuentran las clases que se implementaran en menu.
-# Commit 3: Cambios en los imports.
 import io
 import os
 import unicodedata
-
+# commit 4: Import y hacer graficos 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -99,3 +99,38 @@ class ArchivoCSV(Archivo):
         buffer = io.StringIO()
         self.__tabla.info(buf=buffer)
         return buffer.getvalue() + "\n" + str(self.__tabla.describe())
+# Graficar cada condicion.
+    def graficar_condicion(self, condicion, canal, canal_x, canal_y):
+        datos = self.__tabla[self.__tabla["condition"] == condicion]
+        fig = plt.figure(figsize=(12, 8))
+        ax1 = fig.add_subplot(2, 1, 1)
+        ax2 = fig.add_subplot(2, 2, 3)
+        ax3 = fig.add_subplot(2, 2, 4)
+        fig.suptitle(f"{self.verNombre()} - condición {condicion}")
+
+# Stem con una línea roja en t = 0 ms (sin marcadores y con líneas finas,
+# son muchas muestras y si no se vuelve una mancha)
+        marcas, lineas, base = ax1.stem(datos.index, datos[canal], markerfmt=" ", basefmt="k-")
+        lineas.set_linewidth(0.4)
+        ax1.axvline(0, color="red", linestyle="--")
+        ax1.set_title(f"Señal del canal {canal}")
+        ax1.set_xlabel("Tiempo (ms)")
+        ax1.set_ylabel("Voltaje (µV)")
+
+# Histograma del mismo canal
+        ax2.hist(datos[canal], bins=30, edgecolor="black")
+        ax2.set_title(f"Histograma del canal {canal}")
+        ax2.set_xlabel("Voltaje (µV)")
+        ax2.set_ylabel("Frecuencia")
+        
+# Scatter entre dos canales
+        ax3.scatter(datos[canal_x], datos[canal_y], s=10, alpha=0.5)
+        ax3.set_title(f"{canal_x} vs {canal_y}")
+        ax3.set_xlabel(f"{canal_x} (µV)")
+        ax3.set_ylabel(f"{canal_y} (µV)")
+
+        fig.tight_layout()
+        ruta = guardar_figura(fig, f"{os.path.splitext(self.verNombre())[0]}_cond{condicion}_{canal}")
+        plt.show()
+        plt.close(fig)
+        return ruta
