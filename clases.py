@@ -2,11 +2,11 @@
 # En este archivo se encuentran las clases que se implementaran en menu.
 import io
 import os
-import unicodedata
- 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+import matplotlib.pyplot as plt
+import scipy.io as sio
 
 #  guardar todas los graficos.
 
@@ -161,3 +161,44 @@ class Sistema:
             if texto.lower() in nombre.lower():
                 encontrados.append(self.__archivos[nombre])
         return encontrados
+# Clase para cargar y manipular un archivo Mat
+class ArchivoMAT(Archivo):
+    def __init__(self, ruta):
+        Archivo.__init__(self, ruta)
+        self.__fs = 250
+# whosmat da variable, dimensiones y tipo sin cargar los datos
+        self.__info = sio.whosmat(ruta)
+        self.__variable = ""
+        for nombre, forma, tipo in self.__info:
+            if len(forma) == 3:
+                self.__variable = nombre
+        if self.__variable == "":
+            raise ValueError("El .mat no tiene ninguna variable de 3 dimensiones")
+        self.__matriz = sio.loadmat(ruta)[self.__variable]
+
+    def verFs(self):
+        return self.__fs
+
+    def verMatriz3D(self):
+        return self.__matriz
+
+    def verCanales(self):
+        return self.__matriz.shape[0]
+
+    def verPuntos(self):
+        return self.__matriz.shape[1]
+
+    def verEnsayos(self):
+        return self.__matriz.shape[2]
+
+    def verTotalPuntos(self):
+        return self.__matriz.shape[1] * self.__matriz.shape[2]
+
+    def convertirA2D(self):
+        # (canales, puntos, ensayos) -> (canales, puntos * ensayos), un ensayo tras otro
+        canales, puntos, ensayos = self.__matriz.shape
+        return np.reshape(self.__matriz, (canales, puntos * ensayos), order="F")
+
+    def __str__(self):
+        tabla = pd.DataFrame(self.__info, columns=["Variable", "Dimensiones", "Tipo"])
+        return tabla.to_string(index=False) + "\nVariable usada: " + self.__variable
