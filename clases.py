@@ -3,7 +3,7 @@
 import io
 import os
 import unicodedata
-# commit 4: Import y hacer graficos 
+ 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -134,3 +134,10 @@ class ArchivoCSV(Archivo):
         plt.show()
         plt.close(fig)
         return ruta
+# Commit 5: Realiza la parte de la pregunta de diferencia interhemisférica.
+
+    def diferencia_interhemisferica(self, canal_izq, canal_der):
+# Canal del hemisferio izquierdo menos derecho.
+        nueva = "Dif_" + canal_izq + "-" + canal_der
+        self.__tabla[nueva] = self.__tabla[canal_izq] - self.__tabla[canal_der]
+        return self.__tabla[["condition", canal_izq, canal_der, nueva]]
