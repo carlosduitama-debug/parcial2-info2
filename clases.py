@@ -1,7 +1,12 @@
 # Clases.py - Parcial 2, Informatica 2.
 # En este archivo se encuentran las clases que se implementaran en menu.
+# Commit 3: Cambios en los imports.
+import io
 import os
 import unicodedata
+
+import numpy as np
+import pandas as pd
 
 #  guardar todas los graficos.
 
@@ -69,4 +74,28 @@ class Archivo:
     def verNombre(self):
         return self.__nombre
 
-from clases import Archivo, _buscar_columna; print(Archivo('clases.py').verNombre()); print(_buscar_columna(['Condición', 'Fz'], ['condicion']))
+# Clase para manejar un archivo CSV de ERP. Hace tabla de pandas con el tiempo, como indice.
+class ArchivoCSV(Archivo):
+    def __init__(self, ruta):
+        Archivo.__init__(self, ruta)
+        tabla = pd.read_csv(ruta)
+        # la columna de tiempo pasa a ser el índice de las filas
+        self.__tabla = tabla.set_index("time_ms")
+# Para ver la tabla, canales, condiciones. 
+    def verTabla(self):
+        return self.__tabla
+
+    def verCondiciones(self):
+        return sorted(self.__tabla["condition"].unique())
+
+    def verCanales(self):
+        canales = []
+        for columna in self.__tabla.columns:
+            if columna != "subject" and columna != "condition":
+                canales.append(columna)
+        return canales
+
+    def __str__(self):
+        buffer = io.StringIO()
+        self.__tabla.info(buf=buffer)
+        return buffer.getvalue() + "\n" + str(self.__tabla.describe())
