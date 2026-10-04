@@ -4,7 +4,7 @@ import io
 import os
 import numpy as np
 import pandas as pd
-
+import unicodedata
 import matplotlib.pyplot as plt
 import scipy.io as sio
 
@@ -255,3 +255,16 @@ class ArchivoMAT(Archivo):
         plt.show()
         plt.close(fig)
         return ruta
+
+# Parte 2 y complemento. 
+# Dar las funciones para pasarlas como argumentos a operar_cuatro_canales
+def suma(a, b, c, d):
+    return a + b + c + d
+
+
+def resta(a, b, c, d):
+    return a - b - c - d
+
+
+def multiplicacion(a, b, c, d):
+    return a * b * c * d
