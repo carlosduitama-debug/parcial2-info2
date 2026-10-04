@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+.DS_Store
+
+# Para que evite los archivos pesados que ya deberian estar cargados en el PC.
+*.mat
+
+# Los graficos que genera el programa al cargarse.
+graficos/
